@@ -14,7 +14,7 @@ class ProductManagerDB{
     };
 
     async getProducts(){
-        const products = await productModel.find({});
+        const products = await productModel.find({}).lean();
         return products;
     };
 
