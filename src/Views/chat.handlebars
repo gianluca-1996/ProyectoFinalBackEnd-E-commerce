@@ -1,0 +1,17 @@
+<div id="userNameBox">
+    <h4>Ingrese su nombre se usuario:</h4>
+    <div>
+        <input name="user" id="user" placeholder="usuario" type="text">
+        <button type="button" id="btnUserConfirm">Confirmar</button>
+    </div>
+</div>
+<div id="chatBox" style="display: none;">
+    <h3 id="userName"></h3>
+    <div id="messageList"></div>
+    <div>
+        <input name="message" id="message" placeholder="message" type="text">
+        <button type="button" id="btnEnviar">Enviar</button>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js"></script>
