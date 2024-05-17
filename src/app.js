@@ -32,8 +32,5 @@ socketServer.on('connection', async socket => {
     const dataDb = await messageModel.find({});
     socket.emit('messagesDB', dataDb);
 
-    socket.on('message', async (data) => {
-        console.log(data);
-        await messageModel.create({user: data.userName, message: data.message});
-    })
+    socket.on('message', async (data) => { await messageModel.create({user: data.userName, message: data.message}) })
 })
