@@ -10,9 +10,9 @@ class CartManagerDB{
 
     async addCart(){ await cartModel.create({}) };
 
-    async getCarts(){ return await cartModel.find({}) };
+    async getCarts(){ return await cartModel.find() };
 
-    async getCartById(id){ return await cartModel.findById(id) };
+    async getCartById(id){ return await cartModel.findById(id).populate('products.pid') };
 
     async addProduct(cid, pid){ 
         const product = await productMgr.getProductById(pid);
@@ -36,6 +36,15 @@ class CartManagerDB{
         }
         else{ throw Error("El producto especificado no existe en la base de datos") }
     };
+
+    async deleteProduct(cid, pid){ await cartModel.updateOne( { _id: cid }, { $pull: { products: {pid: pid} } } ) };
+
+    async updateProduct(cid, pid, quantity){
+        if(quantity < 0 || !quantity) throw Error("quantity no contiene un valor consistente");
+        await cartModel.updateOne( { _id: cid, "products.pid": pid }, { $set: {"products.$.quantity": quantity} } );
+    }
+
+    async deleteAllProducts(cid){ await cartModel.updateOne( { _id: cid }, { $set: { products: [] } } ) };
 }
 
 module.exports = CartManagerDB;

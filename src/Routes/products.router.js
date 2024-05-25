@@ -76,15 +76,6 @@ router.delete('/:pid', async (req, res) => {
 })
 */
 
-router.get('/', async (req, res) => {
-    try {
-        const products = await productMngr.getProducts();
-        res.send({result: 'Success', payload: products});
-    } catch (error) {
-        res.status(500).send('Error: ' + error.message);
-    }
-})
-
 router.get('/realTimeProducts', async (req, res) => {
     try {
         const productos = new Array(...await productMngr.getProducts());
@@ -94,7 +85,7 @@ router.get('/realTimeProducts', async (req, res) => {
     }
 })
 
-router.get('/:pid', async (req, res) => {
+router.get('/byPid/:pid', async (req, res) => {
     try {
         const product = await productMngr.getProductById(req.params.pid);
         res.send({result: 'success', payload: product});
@@ -103,10 +94,20 @@ router.get('/:pid', async (req, res) => {
     }
 })
 
+router.get('/', async (req, res) => {
+    const {limit, page, sort, query, value} = req.query;
+    try {
+        const products = await productMngr.getProductsByFilters(limit, page, sort, query, value);
+        res.send({result: "Success", payload: products});
+    } catch (error) {
+        res.send({result: "Error: " + error.message});
+    }
+})
+
 router.post('/', uploader.single('file'), async (req, res) => {
     try {
         const {code, title, description, price, stock, category} = req.body;
-        const thumbnail = req.file ? [req.file.filename] : []; 
+        const thumbnail = req.file && req.file.filename; 
         await productMngr.addProduct(code, title, description, parseFloat(price), thumbnail, parseInt(stock), category);
         res.send({result: 'success'});
     } catch (error) {

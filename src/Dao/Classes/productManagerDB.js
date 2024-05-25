@@ -7,16 +7,32 @@ class ProductManagerDB{
             title: title,
             description: description,
             price: price,
-            thumbnail: thumbnail,
+            thumbnail: '/Img/' + thumbnail,
             stock: stock,
             category: category
         })
     };
 
     async getProducts(){
-        const products = await productModel.find({}).lean();
+        const products = await productModel.find();
         return products;
     };
+
+    async getProductsByFilters(limit, page, sort, query, stock ){
+        const quantityDocs = (isNaN(limit) || !limit) ? 10 : parseInt(limit);
+        const pagesDocs = (isNaN(page) || !page) ? 1 : parseInt(page);
+        const sortDocs = sort == 'asc' ? {price: 1} : (sort == 'desc' ? {price: -1} : {});
+        const options = {
+            limit: quantityDocs,
+            page: pagesDocs,
+            sort: sortDocs
+        }
+        return await productModel.paginate( 
+            {$and: [query === 'pizza' ? {category: 'pizza'} : (query === 'empanada' ? {category: 'empanada'} : {}),
+            stock === 'aplica' ? {stock: { $gt: 0 }} : (stock === 'noAplica' ? {stock: { $eq: 0 }} : {})]}
+            , options
+        );
+    }
 
     async getProductById(id){return await productModel.findById(id)};
 

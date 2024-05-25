@@ -19,7 +19,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/chat', viewsRouter);
+app.use('/views', viewsRouter);
 app.use(express.static(__dirname + '/Public'));
 
 mongoose.connect("mongodb+srv://gianluca96:coder.k1ekiv@coderbackend.eme0pdu.mongodb.net/eCommerce?retryWrites=true&w=majority&appName=CoderBackEnd")

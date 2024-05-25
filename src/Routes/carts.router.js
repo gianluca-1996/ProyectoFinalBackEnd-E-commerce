@@ -80,4 +80,34 @@ router.post('/addProduct', async (req, res) => {
     }
 })
 
+router.delete('/:cid/products/:pid', async (req, res) => {
+    try {
+        const {cid, pid} = req.params;
+        cartMngr.deleteProduct(cid, pid);
+        res.send( { result: "Success" } );
+    } catch (error) {
+        res.send( { result: "Error: " + error.message} );
+    }
+})
+
+router.delete('/:cid', async (req, res) => {
+    try {
+        await cartMngr.deleteAllProducts(req.params.cid);
+        res.send( { result: "Success" } );
+    } catch (error) {
+        res.send( { result: "Error: " + error.message} );
+    }
+})
+
+router.put('/:cid/products/:pid', async (req, res) => {
+    try {
+        const quantity = parseInt(req.body.quantity);
+        const {cid, pid} = req.params;
+        await cartMngr.updateProduct(cid, pid, quantity);
+        res.send({ result: "Success"});
+    } catch (error) {
+        res.send({ result: "Error: " + error.message});
+    }
+})
+
 module.exports = router;
