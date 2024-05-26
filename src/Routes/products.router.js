@@ -85,7 +85,7 @@ router.get('/realTimeProducts', async (req, res) => {
     }
 })
 
-router.get('/byPid/:pid', async (req, res) => {
+router.get('/:pid', async (req, res) => {
     try {
         const product = await productMngr.getProductById(req.params.pid);
         res.send({result: 'success', payload: product});

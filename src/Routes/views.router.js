@@ -2,7 +2,9 @@ const Router = require("express");
 const router = Router();
 const handlebars = require("express-handlebars");
 const ProductManagerDB = require("../Dao/Classes/productManagerDB.js");
+const CartManagerDB = require('../Dao/Classes/cartManagerDB.js');
 const productMngr = new ProductManagerDB();
+const cartMngr = new CartManagerDB();
 router.engine("handlebars", handlebars.engine());
 router.set("views", __dirname + "/../Views");
 router.set("view engine", "handlebars");
@@ -32,6 +34,16 @@ router.get('/products', async (req, res) => {
             prevLink: data.hasPrevPage ? `http://localhost:8080/views/products?limit=${data.limit}&page=${data.prevPage}&sort=${sort}&query=${query}&stock=${stock}` : null,
             nextLink: data.hasNextPage ? `http://localhost:8080/views/products?limit=${data.limit}&page=${data.nextPage}&sort=${sort}&query=${query}&stock=${stock}` : null
         });
+    } catch (error) {
+        res.send({result: "Error: " + error.message});
+    }
+})
+
+router.get('/carts/:cid', async (req,res) => {
+    try {
+        const cart = await cartMngr.getCartById(req.params.cid);
+        const products = cart.products;
+        res.render('cart', {products: products, lenght: true});
     } catch (error) {
         res.send({result: "Error: " + error.message});
     }

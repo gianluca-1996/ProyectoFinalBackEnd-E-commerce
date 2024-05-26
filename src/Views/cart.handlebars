@@ -1,0 +1,30 @@
+<div class="container text-center">
+    {{#if lenght}}
+        <h2>Productos en carrito</h2>
+        <div class="row">        
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">title</th>
+                        <th scope="col">description</th>
+                        <th scope="col">price</th>
+                        <th scope="col">quantity</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                        <tr>
+                            <td>{{pid.title}}</td>
+                            <td>{{pid.description}}</td>
+                            <td>${{pid.price}}</td>
+                            <td>1</td>
+                            <td><button class="btn btn-danger" type="submit">Eliminar</button></td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+    {{else}}
+        <h3>No hay productos en este carrito</h3>
+    {{/if}}
+</div>

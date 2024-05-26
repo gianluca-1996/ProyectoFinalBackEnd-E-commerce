@@ -7,7 +7,7 @@ class ProductManagerDB{
             title: title,
             description: description,
             price: price,
-            thumbnail: '/Img/' + thumbnail,
+            thumbnail: thumbnail,
             stock: stock,
             category: category
         })

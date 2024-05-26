@@ -3,22 +3,25 @@ const ProductManager = require('../Classes/productManagerDB.js');
 const productMgr = new ProductManager();
 
 class CartManagerDB{
-    async getCartById(id){
-        const cart = await cartModel.findById(id);
+    /*async getCartById(id){
+        const cart = await cartModel.findById(id).lean();
         return cart;
-    };
+    };*/
 
     async addCart(){ await cartModel.create({}) };
 
     async getCarts(){ return await cartModel.find() };
 
-    async getCartById(id){ return await cartModel.findById(id).populate('products.pid') };
+    async getCartById(id){ return await cartModel.findById(id).lean().populate('products.pid') };
 
     async addProduct(cid, pid){ 
         const product = await productMgr.getProductById(pid);
         if(product){
+            if(product.stock === 0){
+                throw Error("El producto especificado no posee stock");
+            }
             const cart = await cartModel.findById(cid);
-            const inCartProduct = cart.products.find(element => element.pid === pid);
+            const inCartProduct = cart.products.find(element => element.pid == pid);
 
             if(inCartProduct){ 
                 inCartProduct.quantity += 1;
@@ -33,6 +36,8 @@ class CartManagerDB{
                     { $push: {products: { pid: pid, quantity: 1 } } }
                 );
             }
+
+            await productMgr.updateProduct(pid, null, 'stock', product.stock - 1);
         }
         else{ throw Error("El producto especificado no existe en la base de datos") }
     };

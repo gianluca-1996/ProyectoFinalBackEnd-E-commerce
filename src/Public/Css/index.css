@@ -1,9 +1,12 @@
 #imgProduct{
-    height: 50%;
+    height: 40%;
 }
 
 .card{
-    width: 18rem; 
-    height: 25rem;
-    margin: 1rem;
+    height: 90%;
+    margin: 2%;
+}
+
+#nav{
+    background-color: cornflowerblue;
 }

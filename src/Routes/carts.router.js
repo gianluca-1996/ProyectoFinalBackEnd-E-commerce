@@ -2,6 +2,8 @@ const Router = require('express')
 const router = Router();
 const CartManagerDB = require('../Dao/Classes/cartManagerDB.js');
 const cartMngr = new CartManagerDB();
+const ProductManagerDB = require('../Dao/Classes/productManagerDB.js');
+const prodMngr = new ProductManagerDB();
 /*const ProductManager = require('../Dao/Classes/productManager.js');
 const cartMngr = new CartManager('./carritos.json');
 const productMngr = new ProductManager('./productos.json');
@@ -71,12 +73,13 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.post('/addProduct', async (req, res) => {
+router.post('/:cid/product/:pid', async (req, res) => {
+    const {cid, pid} = req.params;
     try {
-        await cartMngr.addProduct(req.body.cid, req.body.pid);
-        res.send({result: "success"});
+        await cartMngr.addProduct(cid, pid);
+        res.send({result: 'success'});
     } catch (error) {
-        res.status(500).send("ERROR: " + error.message);
+        res.status(500).send({error: "ERROR: " + error.message});
     }
 })
 

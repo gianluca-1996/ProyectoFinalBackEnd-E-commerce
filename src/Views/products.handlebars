@@ -66,39 +66,43 @@
                 <div class="col-4">
                     <div class="card">
                         {{#each thumbnail}}
-                            <img src={{this}} class="card-img-top" alt="product" id="imgProduct">
+                            <img src="/Img/{{this}}" class="card-img-top" alt="product" id="imgProduct">
                         {{/each}}
                         <div class="card-body row">
                             <h5 class="card-title">{{title}}</h5>
-                            <p class="card-text">{{description}}</p>
-                            <p><strong>Price: ${{price}}</strong></p>
-                            <a href="#" class="btn btn-primary">Agregar al carrito</a>
-                            <form action="/api/carts/addProduct?" method="post"></form>
+                            <p class="card-text">
+                                <p><strong>{{description}}</strong></p>
+                                <p><strong>Stock: </strong>{{stock}}</p>
+                                <p><strong>Price: ${{price}}</strong></p>
+                            </p>
+                            <form action="/api/carts/66537daae5da13c6700a723a/product/{{_id}}" method="post">
+                                <button class="btn btn-primary" type="submit">Agregar al carrito</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             {{/each}}
-            <div class="row">
-                <ul class="pagination justify-content-center">
-                    {{#if hasPrevPage}}
-                        <li class="page-item">
-                            <a class="page-link" href="{{prevLink}}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="{{prevLink}}">{{prevPage}}</a></li>
-                    {{/if}}
-                    <li class="page-item"><a class="page-link" href="#">{{page}}</a></li>
-                    {{#if hasNextPage}}
-                        <li class="page-item"><a class="page-link" href="{{nextLink}}">{{nextPage}}</a></li>
-                        <li class="page-item">
-                        <a class="page-link" href="{{nextLink}}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
+        </div>
+        <div class="row">
+            <ul class="pagination justify-content-center">
+                {{#if hasPrevPage}}
+                    <li class="page-item">
+                        <a class="page-link" href="{{prevLink}}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
-                        </li>
-                    {{/if}}
-                </ul>
-            </div>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="{{prevLink}}">{{prevPage}}</a></li>
+                {{/if}}
+                <li class="page-item"><a class="page-link" href="#">{{page}}</a></li>
+                {{#if hasNextPage}}
+                    <li class="page-item"><a class="page-link" href="{{nextLink}}">{{nextPage}}</a></li>
+                    <li class="page-item">
+                    <a class="page-link" href="{{nextLink}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                {{/if}}
+            </ul>
         </div>
     {{else}}
         <h2>No hay productos</h2>
