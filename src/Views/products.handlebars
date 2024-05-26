@@ -75,7 +75,7 @@
                                 <p><strong>Stock: </strong>{{stock}}</p>
                                 <p><strong>Price: ${{price}}</strong></p>
                             </p>
-                            <form action="/api/carts/66537daae5da13c6700a723a/product/{{_id}}" method="post">
+                            <form class="item-form" data-id="{{this._id}}">
                                 <button class="btn btn-primary" type="submit">Agregar al carrito</button>
                             </form>
                         </div>
@@ -113,3 +113,4 @@
         </div>
     {{/if}}
 </div>
+<script src="/Js/cart.js"></script>

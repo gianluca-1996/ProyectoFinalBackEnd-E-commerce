@@ -79,7 +79,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
         await cartMngr.addProduct(cid, pid);
         res.send({result: 'success'});
     } catch (error) {
-        res.status(500).send({error: "ERROR: " + error.message});
+        res.send({error: "ERROR: " + error.message});
     }
 })
 
