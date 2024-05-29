@@ -5,13 +5,14 @@ const ProductManagerDB = require("../Dao/Classes/productManagerDB.js");
 const CartManagerDB = require('../Dao/Classes/cartManagerDB.js');
 const productMngr = new ProductManagerDB();
 const cartMngr = new CartManagerDB();
+const {isAuthenticated, isNotAuthenticated} = require('../middlewares/auth.js');
 router.engine("handlebars", handlebars.engine());
 router.set("views", __dirname + "/../Views");
 router.set("view engine", "handlebars");
 
 router.get('/', async (req, res) => { res.render('chat', {}) });
 
-router.get('/products', async (req, res) => {
+router.get('/products', isAuthenticated, async (req, res) => {
     try {
         const {limit, page, sort, query, stock} = req.query;
         const data = await productMngr.getProductsByFilters(limit, page, sort, query, stock);
@@ -39,7 +40,7 @@ router.get('/products', async (req, res) => {
     }
 })
 
-router.get('/carts/:cid', async (req,res) => {
+router.get('/carts/:cid', isAuthenticated, async (req,res) => {
     try {
         const cart = await cartMngr.getCartById(req.params.cid);
         const products = cart.products;
@@ -48,6 +49,10 @@ router.get('/carts/:cid', async (req,res) => {
         res.send({result: "Error: " + error.message});
     }
 })
+
+router.get('/login', isNotAuthenticated, (req, res) => { res.render('login') } );
+
+router.get('/register', isNotAuthenticated, (req, res) => { res.render('register') } );
 
 /*
 router.post('/message', async (req, res) => {
