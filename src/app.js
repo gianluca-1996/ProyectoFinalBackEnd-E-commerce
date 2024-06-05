@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const initializePassport = require('./Config/passport.config.js');
+const {initializePassport, initializePassportGithub} = require('./Config/passport.config.js');
 const app = express();
 const PORT = 8080;
 const session = require('express-session');
@@ -29,9 +29,10 @@ app.use(session({
     store: MongoStore.create({ mongoUrl: 'mongodb+srv://gianluca96:coder.k1ekiv@coderbackend.eme0pdu.mongodb.net/eCommerce?retryWrites=true&w=majority&appName=CoderBackEnd' })
     // cookie: { maxAge: 180 * 60 * 1000 },
 }));
-initializePassport()
-app.use(passport.initialize())
-app.use(passport.session())
+initializePassport();
+initializePassportGithub();
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middleware para establecer variables globales y manejar las vistas segun la sesion del usuario
 app.use((req, res, next) => {

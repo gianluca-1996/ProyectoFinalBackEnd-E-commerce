@@ -1,8 +1,10 @@
 const passport = require('passport');
 const local = require('passport-local');
+const GitHubStrategy = require('passport-github2');
 const userModel = require('../Dao/Models/user.model.js');
 const bcrypt = require('bcrypt');
 
+//ESTRATEGIA LOCAL DE PASSPORT
 const LocalStrategy = local.Strategy;
 const initializePassport = () => {
     passport.use('register', new LocalStrategy(
@@ -42,8 +44,12 @@ const initializePassport = () => {
                 return done('El usuario no existe');
             }
 
-            const matchPassword = await bcrypt.compare(password, user.password);
-            if(!matchPassword) return done('Contraseña incorrecta');
+            if(user.password){
+                const matchPassword = bcrypt.compare(password, user.password);
+                if(!matchPassword) return done('Contraseña incorrecta');
+            }
+            else return done('Contraseña incorrecta');
+            
             return done(null, user);
         } catch (error) {
             return done(error);
@@ -60,4 +66,41 @@ const initializePassport = () => {
     })
 }
 
-module.exports = initializePassport;
+//ESTRATEGIA PASSPORT-GITHUB
+const initializePassportGithub = () => {
+
+    passport.use('github', new GitHubStrategy({
+        clientID: 'Iv23liFnga3SgPr4FAFr',
+        clientSecret: '6726d15c05f82fc08f4209355940d3f7b6c00cca',
+        callbackURL: 'http://localhost:8080/api/session/githubcallback'
+    }, async (accessToken, refreshToken, profile, done) => {
+        try {
+            console.log(profile);
+            const user = await userModel.findOne({email: profile._json.email});
+            if(!user){
+                const newUser = {
+                    firstName: profile._json.name,
+                    lastName: ' ',
+                    email: profile._json.email,
+                    age: 18,
+                    role: 'user'
+                }
+
+                const result = await userModel.create(newUser);
+                done(null, result);
+            }
+            else{ done(null, user) }
+        } catch (error) {
+            return done(error);
+        }
+    }))
+
+    passport.serializeUser((user, done) => { done(null, user._id) })
+
+    passport.deserializeUser(async (id, done) => {
+        let user = await userModel.findById(id);
+        done(null, user);
+    })
+}
+
+module.exports = {initializePassport, initializePassportGithub};

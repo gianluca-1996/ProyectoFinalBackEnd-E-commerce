@@ -42,4 +42,11 @@ router.get('/failLogin', (req, res) => {
     res.send({error: 'error al hacer el login'});
 })
 
+router.get('/github', passport.authenticate('github', {scope: ['user:email']}), (req, res) => {});
+
+router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/api/session/failLogin'}), (req, res) => {
+    req.session.user = req.user;
+    res.redirect('/views/products');
+});
+
 module.exports = router;
