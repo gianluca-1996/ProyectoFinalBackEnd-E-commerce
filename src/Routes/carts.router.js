@@ -87,7 +87,7 @@ router.delete('/:cid/products/:pid', async (req, res) => {
     try {
         const {cid, pid} = req.params;
         cartMngr.deleteProduct(cid, pid);
-        res.send( { result: "Success" } );
+        res.send( { result: "success" } );
     } catch (error) {
         res.send( { result: "Error: " + error.message} );
     }

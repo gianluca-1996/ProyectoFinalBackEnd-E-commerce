@@ -1,9 +1,9 @@
 <div class="container text-center">
     <div class="row">
         {{#if isAdmin}}
-            <p>Bienvenido role <strong>Administrador!</strong></p>
+            <p>Bienvenido <strong>Administrador!</strong></p>
         {{else}}
-            <p>Bienvenido role <strong>Usuario!</strong></p>
+            <p>Bienvenido <strong>Usuario!</strong></p>
         {{/if}}
         <p>firstName: <strong>{{user.firstName}}</strong></p>
         <p>lastName: <strong>{{user.lastName}}</strong></p>
@@ -82,11 +82,12 @@
                         <div class="card-body row">
                             <h5 class="card-title">{{title}}</h5>
                             <p class="card-text">
+                                <p>{{user.cart}}</p>
                                 <p><strong>{{description}}</strong></p>
                                 <p><strong>Stock: </strong>{{stock}}</p>
                                 <p><strong>Price: ${{price}}</strong></p>
                             </p>
-                            <form class="item-form" data-id="{{this._id}}">
+                            <form class="item-form" data-id="{{this._id}}" data-cart="{{../user.cart}}">
                                 <button class="btn btn-primary" type="submit">Agregar al carrito</button>
                             </form>
                         </div>

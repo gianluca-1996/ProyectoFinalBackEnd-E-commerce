@@ -8,7 +8,12 @@ class CartManagerDB{
         return cart;
     };*/
 
-    async addCart(){ await cartModel.create({}) };
+    async addCart(session){ 
+        const cart = new cartModel({});
+        await cart.save(session && { session: session });
+        return cart;
+        
+    };//{ await cartModel.create({}) };
 
     async getCarts(){ return await cartModel.find() };
 

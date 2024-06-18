@@ -1,52 +1,78 @@
 const Router = require('express');
 const router = Router();
-const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const userModel = require('../Dao/Models/user.model.js');
+const CartManagerDB = require('../Dao/Classes/cartManagerDB.js');
+const cartMngr = new CartManagerDB();
+const mongoose = require('mongoose');
+const {passportCall} = require('../middlewares/auth.js');
 
-router.post('/register', passport.authenticate('register', {failureRedirect: '/api/session/failRegister'}), async (req, res) => {    
-    //una vez registrado correctamente redirecciona al usuario al login para iniciar sesion
-    res.redirect('/views/login');
+router.post('/register', async (req, res) => {    
+    const {firstName, lastName, email, age, role, password} = req.body;
+    
+    const session = await mongoose.startSession();
+    //inicia la transaccion
+    session.startTransaction();
+    try {
+        const user = await userModel.findOne({email: email});
+        if(user) return res.send('El usuario ya existe');
+        const newCart = await cartMngr.addCart(session);
+
+        const passEncrypted = await bcrypt.hash(password, 2);
+        const newUser = {
+            firstName,
+            lastName,
+            email,
+            age,
+            role,
+            password: passEncrypted,
+            cart: newCart._id
+        }
+
+        await userModel.create([newUser], { session: session });
+        //Confirma la transacción
+        await session.commitTransaction();
+        //una vez registrado correctamente redirecciona al usuario al login para iniciar sesion
+        res.redirect('/views/login');
+    } catch (error) {
+        await session.abortTransaction();
+        return res.send({error: error.message});
+    }finally {
+        // Finaliza la sesión
+        session.endSession();
+      }
 });
 
-router.post('/login', passport.authenticate('login', {failureRedirect: '/api/session/failLogin'}), async (req, res) => {
-    
-    const user = req.user;
-    //si no se encuentra el usuario se informa el error
-    if(!user){ return res.status(400).send({result: 'Error', message: 'credenciales inválidas'}) }
-    
-    //guarda la sesion del usuario
-    req.session.user = {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email, 
-        age: user.age,
-        role: user.role
-    }
+router.post('/login', async (req, res) => {
+    const {email, password} = req.body;
+    try {
+        const user = await userModel.findOne({email: email}).lean();
+        if(!user){ return res.status(400).send({result: 'Error', message: 'Usuario invalido'}) }
 
-    //redirecciona al perfil
-    res.redirect('/views/products');
+        const matchPassword = await bcrypt.compare(password, user.password);
+        if(!matchPassword) return res.send('Contraseña incorrecta');
+
+        //crea token, lo envia en una cookie y redirecciona a la pagina principal
+        const token = jwt.sign(user, 'coderSecret', {expiresIn: '10m'});
+        res.cookie('coderCookieToken', token, {maxAge: 60 * 60 * 1000, httpOnly: true} ).redirect('/views/products');
+    } catch (error) {
+        return res.send(error);
+    }
 });
 
 router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if(err) return res.status(500).send({result: 'Error', message: 'Error al cerrar sesión'});
-        res.redirect('/views/login');
-    });
+    res.cookie('coderCookieToken', '', { expires: new Date(0), httpOnly: true }).redirect('/views/login');
 });
 
-router.get('/failRegister', (req, res) => {
-    res.send({error: 'error al registrar el usuario'});
+router.get('/current', passportCall('jwt'), async (req, res) => {
+    let user;
+    try {
+        //llamo a la base para obtener la referencia al carito dentro de la respuesta
+        user = await userModel.findById(req.user._id).lean().populate('cart');
+    } catch (error) {
+        console.log(error.message);
+    }
+    res.send({user: user});
 })
-
-router.get('/failLogin', (req, res) => {
-    res.send({error: 'error al hacer el login'});
-})
-
-router.get('/github', passport.authenticate('github', {scope: ['user:email']}), (req, res) => {});
-
-router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/api/session/failLogin'}), (req, res) => {
-    req.session.user = req.user;
-    res.redirect('/views/products');
-});
-
 module.exports = router;

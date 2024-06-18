@@ -1,20 +1,36 @@
-const isAuthenticated = (req, res, next) => {
-    if (req.session?.user) {
-        return next();
-    } else {
-        res.redirect('/views/login');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+
+const passportCall = strategy => {
+    return async (req, res, next) => {
+        passport.authenticate(strategy, (err, user, info) => {
+            if(err) return next(err);
+            if(!user) return res.redirect('/views/login');//res.status(401).send({error: info.messages ? info.messages : info.toString()});
+            req.user = user;
+            next();
+        })(req, res, next)
     }
-};
+}
+
+const authorization = policies => {
+    return async (req, res, next) => {
+        if(!req.user) return res.status(401).send({error: 'Unauthorized'});
+        if(!policies.includes(req.user.role)) return res.status(403).send({error: 'No permissions'});
+        next();
+    }
+}
 
 const isNotAuthenticated = (req, res, next) => {
-    if (!req.session?.user) {
-        return next();
-    } else {
-        res.redirect('/views/products');
+    const tokenCookie = req.cookies['coderCookieToken'];
+    if(tokenCookie){        
+        try {
+            jwt.verify(tokenCookie, 'coderSecret');
+            res.redirect('/views/products');
+        } catch (error) {
+            return next();
+        }
     }
+    else return next();
 };
 
-module.exports = {
-    isAuthenticated,
-    isNotAuthenticated
-}
+module.exports = {isNotAuthenticated, passportCall, authorization};
