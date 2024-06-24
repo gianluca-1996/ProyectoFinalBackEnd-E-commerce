@@ -6,9 +6,9 @@ const userModel = require('../Dao/Models/user.model.js');
 const CartManagerDB = require('../Dao/Classes/cartManagerDB.js');
 const cartMngr = new CartManagerDB();
 const mongoose = require('mongoose');
-const {passportCall} = require('../middlewares/auth.js');
+const {passportCall, isNotAuthenticated} = require('../middlewares/auth.js');
 
-router.post('/register', async (req, res) => {    
+router.post('/register', isNotAuthenticated, async (req, res) => {    
     const {firstName, lastName, email, age, role, password} = req.body;
     
     const session = await mongoose.startSession();
@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
       }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', isNotAuthenticated, async (req, res) => {
     const {email, password} = req.body;
     try {
         const user = await userModel.findOne({email: email}).lean();
